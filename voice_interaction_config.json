@@ -1,0 +1,217 @@
+{
+  "voice_config": {
+    "tts_provider": "azure_speech",
+    "tts_voice_name": "zh-CN-XiaoxiaoNeural",
+    "tts_speech_rate": 0.9,
+    "tts_speech_volume": 0.8,
+    "tts_speech_pitch": 0.0,
+    "asr_provider": "azure_speech",
+    "asr_language": "zh-CN",
+    "asr_sample_rate": 16000,
+    "asr_timeout": 10.0,
+    "asr_silence_timeout": 2.0,
+    "wake_word": "小助手",
+    "confirmation_timeout": 5.0,
+    "max_retry_count": 3,
+    "conversation_timeout": 300.0,
+    "audio_format": "wav",
+    "audio_channels": 1,
+    "audio_sample_rate": 16000,
+    "audio_chunk_size": 1024
+  },
+  "voice_recommendations": {
+    "azure_speech": {
+      "recommended_voices": [
+        "zh-CN-XiaoxiaoNeural",
+        "zh-CN-YunxiNeural",
+        "zh-CN-XiaoyiNeural",
+        "zh-CN-YunjianNeural"
+      ],
+      "optimal_settings": {
+        "rate": 0.9,
+        "volume": 0.8,
+        "pitch": "+2st"
+      }
+    },
+    "openai_tts": {
+      "recommended_voices": [
+        "alloy",
+        "nova",
+        "shimmer"
+      ],
+      "optimal_settings": {
+        "speed": 0.9,
+        "model": "tts-1-hd"
+      }
+    },
+    "baidu_speech": {
+      "recommended_voices": [
+        "0",
+        "1",
+        "3",
+        "4"
+      ],
+      "optimal_settings": {
+        "spd": 5,
+        "pit": 5,
+        "vol": 8
+      }
+    }
+  },
+  "asr_recommendations": {
+    "azure_speech": {
+      "language": "zh-CN",
+      "recognition_mode": "conversation",
+      "profanity_option": "masked",
+      "enable_dictation": true,
+      "phrase_list": [
+        "Python开发工程师",
+        "Java开发工程师",
+        "前端开发",
+        "UI设计师",
+        "产品经理",
+        "数据分析师",
+        "北京",
+        "上海",
+        "深圳",
+        "广州",
+        "杭州",
+        "薪资",
+        "工资",
+        "月薪",
+        "年薪"
+      ]
+    },
+    "openai_whisper": {
+      "model": "whisper-1",
+      "language": "zh",
+      "temperature": 0.0,
+      "prompt": "这是一个求职对话，包含职位名称、城市名称和薪资信息。"
+    },
+    "baidu_asr": {
+      "dev_pid": 1537,
+      "rate": 16000,
+      "format": "wav",
+      "cuid": "voice_job_assistant"
+    }
+  },
+  "conversation_flow": {
+    "stages": {
+      "greeting": {
+        "max_duration": 30,
+        "expected_keywords": [
+          "你好",
+          "开始",
+          "找工作"
+        ],
+        "fallback_prompt": "请说您好开始求职咨询"
+      },
+      "job_type": {
+        "max_duration": 60,
+        "expected_keywords": [
+          "开发",
+          "工程师",
+          "设计师",
+          "经理",
+          "分析师",
+          "python",
+          "java",
+          "前端",
+          "后端",
+          "ui",
+          "产品"
+        ],
+        "fallback_prompt": "请告诉我您想要的职位类型",
+        "confirmation_required": true
+      },
+      "location": {
+        "max_duration": 45,
+        "expected_keywords": [
+          "北京",
+          "上海",
+          "深圳",
+          "广州",
+          "杭州",
+          "成都",
+          "远程",
+          "在家",
+          "不限"
+        ],
+        "fallback_prompt": "请告诉我您希望的工作地点",
+        "confirmation_required": true
+      },
+      "salary": {
+        "max_duration": 45,
+        "expected_keywords": [
+          "千",
+          "万",
+          "K",
+          "薪资",
+          "工资",
+          "月薪",
+          "年薪",
+          "面议"
+        ],
+        "fallback_prompt": "请告诉我您的薪资期望",
+        "confirmation_required": true
+      },
+      "search": {
+        "max_duration": 30,
+        "auto_proceed": true,
+        "show_progress": true
+      }
+    },
+    "error_handling": {
+      "max_retries_per_stage": 3,
+      "global_max_retries": 10,
+      "escalation_prompts": [
+        "我没有听清楚，请再说一遍",
+        "能否换个说法？",
+        "让我们重新开始这个问题"
+      ]
+    },
+    "interruption_handling": {
+      "allow_interruption": true,
+      "interruption_keywords": [
+        "等等",
+        "停",
+        "重新开始",
+        "退出"
+      ],
+      "interruption_actions": {
+        "等等": "pause",
+        "停": "pause",
+        "重新开始": "restart",
+        "退出": "exit"
+      }
+    }
+  },
+  "performance_optimization": {
+    "latency_optimization": {
+      "target_response_time": 1.5,
+      "tts_streaming": true,
+      "asr_streaming": true,
+      "llm_streaming": true,
+      "cache_common_responses": true,
+      "preload_models": true
+    },
+    "quality_optimization": {
+      "noise_reduction": true,
+      "echo_cancellation": true,
+      "automatic_gain_control": true,
+      "voice_activity_detection": true,
+      "confidence_threshold": 0.7
+    },
+    "resource_management": {
+      "max_concurrent_sessions": 10,
+      "session_cleanup_interval": 300,
+      "memory_limit_mb": 512,
+      "cpu_usage_limit": 80
+    }
+  },
+  "integration_examples": {
+    "azure_speech_integration": "\n# Azure Speech Services集成示例\nimport azure.cognitiveservices.speech as speechsdk\n\ndef create_azure_speech_config():\n    speech_config = speechsdk.SpeechConfig(\n        subscription=\"YOUR_SUBSCRIPTION_KEY\",\n        region=\"YOUR_REGION\"\n    )\n    speech_config.speech_synthesis_voice_name = \"zh-CN-XiaoxiaoNeural\"\n    speech_config.set_speech_synthesis_output_format(\n        speechsdk.SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3\n    )\n    return speech_config\n",
+    "openai_integration": "\n# OpenAI TTS/Whisper集成示例\nfrom openai import OpenAI\n\nclient = OpenAI()\n\ndef text_to_speech(text):\n    response = client.audio.speech.create(\n        model=\"tts-1-hd\",\n        voice=\"alloy\",\n        input=text,\n        speed=0.9\n    )\n    return response.content\n\ndef speech_to_text(audio_file):\n    transcript = client.audio.transcriptions.create(\n        model=\"whisper-1\",\n        file=audio_file,\n        language=\"zh\"\n    )\n    return transcript.text\n",
+    "voice_workflow_integration": "\n# 语音工作流集成示例\nfrom voice_optimized_processor import VoiceOptimizedProcessor\nfrom voice_response_formatter import VoiceResponseFormatter\n\nclass VoiceJobAssistant:\n    def __init__(self):\n        self.processor = VoiceOptimizedProcessor()\n        self.formatter = VoiceResponseFormatter()\n    \n    async def process_voice_input(self, audio_data):\n        # 1. 语音转文字\n        text = await self.speech_to_text(audio_data)\n        \n        # 2. 处理文本\n        result = self.processor.process_user_input(text, current_stage)\n        \n        # 3. 格式化响应\n        voice_response = self.formatter.format_response(result)\n        \n        # 4. 文字转语音\n        audio_response = await self.text_to_speech(voice_response.to_ssml())\n        \n        return audio_response, voice_response.to_dict()\n"
+  }
+}

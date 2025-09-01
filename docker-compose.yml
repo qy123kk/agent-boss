@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # 智能求职助手 FastAPI 应用
+  job-assistant-api:
+    build: .
+    container_name: job-assistant-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - HOST=0.0.0.0
+      - PORT=8000
+    volumes:
+      - ./documents:/app/documents
+      - ./vector_store:/app/vector_store
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - job-assistant-network
+
+  # Nginx 反向代理 (可选)
+  nginx:
+    image: nginx:alpine
+    container_name: job-assistant-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl  # SSL证书目录
+    depends_on:
+      - job-assistant-api
+    restart: unless-stopped
+    networks:
+      - job-assistant-network
+
+  # Redis 缓存 (可选)
+  redis:
+    image: redis:alpine
+    container_name: job-assistant-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - job-assistant-network
+
+  # PostgreSQL 数据库 (可选)
+  postgres:
+    image: postgres:15-alpine
+    container_name: job-assistant-postgres
+    environment:
+      - POSTGRES_DB=job_assistant
+      - POSTGRES_USER=job_assistant
+      - POSTGRES_PASSWORD=your_password_here
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - job-assistant-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  job-assistant-network:
+    driver: bridge
